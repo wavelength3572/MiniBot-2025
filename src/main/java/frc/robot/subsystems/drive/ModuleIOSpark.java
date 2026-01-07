@@ -33,18 +33,14 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.AnalogEncoder;
 import java.util.Queue;
 import java.util.function.DoubleSupplier;
 
 /**
- * Module IO implementation for Spark Flex drive motor controller, Spark Max turn motor controller,
- * and duty cycle absolute encoder.
+ * Module IO implementation for Spark Flex drive motor controller and Spark Max turn motor
+ * controller using relative encoders. Requires manual wheel alignment on startup.
  */
 public class ModuleIOSpark implements ModuleIO {
-
-  private final Rotation2d zeroRotation;
-  private final AnalogEncoder absoluteEncoder;
 
   // Hardware objects
   private final SparkBase driveSpark;
@@ -66,14 +62,6 @@ public class ModuleIOSpark implements ModuleIO {
   private final Debouncer turnConnectedDebounce = new Debouncer(0.5);
 
   public ModuleIOSpark(int module) {
-    zeroRotation =
-        switch (module) {
-          case 0 -> frontLeftZeroRotation;
-          case 1 -> frontRightZeroRotation;
-          case 2 -> backLeftZeroRotation;
-          case 3 -> backRightZeroRotation;
-          default -> new Rotation2d();
-        };
     driveSpark =
         new SparkFlex(
             switch (module) {
@@ -98,7 +86,6 @@ public class ModuleIOSpark implements ModuleIO {
     turnEncoder = turnSpark.getEncoder();
     driveController = driveSpark.getClosedLoopController();
     turnController = turnSpark.getClosedLoopController();
-    absoluteEncoder = new AnalogEncoder(module);
 
     // Configure drive motor
     var driveConfig = new SparkFlexConfig();
@@ -170,10 +157,8 @@ public class ModuleIOSpark implements ModuleIO {
             turnSpark.configure(
                 turnConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
 
-    // Initialize turn encoder position from analog absolute encoder
-    double absolutePositionRad =
-        Rotation2d.fromRotations(absoluteEncoder.get()).minus(zeroRotation).getRadians();
-    tryUntilOk(turnSpark, 5, () -> turnEncoder.setPosition(absolutePositionRad));
+    // Initialize turn encoder to 0 - assumes wheels are manually aligned on startup
+    tryUntilOk(turnSpark, 5, () -> turnEncoder.setPosition(0.0));
 
     // Create odometry queues
     timestampQueue = SparkOdometryThread.getInstance().makeTimestampQueue();
@@ -185,8 +170,6 @@ public class ModuleIOSpark implements ModuleIO {
 
   @Override
   public void updateInputs(ModuleIOInputs inputs) {
-    inputs.turnAbsolutePosition =
-        Rotation2d.fromRotations(absoluteEncoder.get()).getRadians(); // Angle in Radians
     // Update drive inputs
     sparkStickyFault = false;
     ifOk(driveSpark, driveEncoder::getPosition, (value) -> inputs.drivePositionRad = value);
