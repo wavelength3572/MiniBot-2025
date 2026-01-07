@@ -91,7 +91,7 @@ public class DriveConstants {
   public static final double driveSimKv = 0.0789;
 
   // Turn motor configuration
-  public static final boolean turnInverted = false;
+  public static final boolean turnInverted = true;
   public static final int turnMotorCurrentLimit = 20;
   // public static final double turnMotorReduction = 9424.0 / 203.0;
 
