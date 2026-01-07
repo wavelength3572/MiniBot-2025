@@ -144,6 +144,7 @@ public class ModuleIOSpark implements ModuleIO {
         .voltageCompensation(12.0);
     turnConfig
         .encoder
+        .inverted(turnEncoderInverted)
         .positionConversionFactor(turnEncoderPositionFactor)
         .velocityConversionFactor(turnEncoderVelocityFactor)
         .uvwMeasurementPeriod(10)
@@ -185,7 +186,8 @@ public class ModuleIOSpark implements ModuleIO {
 
   @Override
   public void updateInputs(ModuleIOInputs inputs) {
-    inputs.turnAbsolutePosition = absoluteEncoder.get(); // This is a Angle in Radians
+    inputs.turnAbsolutePosition =
+        Rotation2d.fromRotations(absoluteEncoder.get()).getRadians(); // Angle in Radians
     // Update drive inputs
     sparkStickyFault = false;
     ifOk(driveSpark, driveEncoder::getPosition, (value) -> inputs.drivePositionRad = value);
