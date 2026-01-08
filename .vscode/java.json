@@ -1,0 +1,137 @@
+{
+  "FRC Command": {
+    "prefix": "frc-command",
+    "body": [
+      "package frc.robot.commands;",
+      "",
+      "import edu.wpi.first.wpilibj2.command.Command;",
+      "",
+      "public class ${1:CommandName} extends Command {",
+      "  ",
+      "  public ${1:CommandName}() {",
+      "    // addRequirements(${2:subsystem});",
+      "  }",
+      "",
+      "  @Override",
+      "  public void initialize() {",
+      "    ${3:// Called when command starts}",
+      "  }",
+      "",
+      "  @Override",
+      "  public void execute() {",
+      "    ${4:// Called repeatedly while command is running}",
+      "  }",
+      "",
+      "  @Override",
+      "  public void end(boolean interrupted) {",
+      "    ${5:// Called when command ends}",
+      "  }",
+      "",
+      "  @Override",
+      "  public boolean isFinished() {",
+      "    return ${6:false};",
+      "  }",
+      "}"
+    ],
+    "description": "Create a new FRC Command class"
+  },
+  "FRC Subsystem": {
+    "prefix": "frc-subsystem",
+    "body": [
+      "package frc.robot.subsystems;",
+      "",
+      "import edu.wpi.first.wpilibj2.command.SubsystemBase;",
+      "import org.littletonrobotics.junction.Logger;",
+      "",
+      "public class ${1:SubsystemName} extends SubsystemBase {",
+      "  ",
+      "  private final ${2:IO} io;",
+      "  private final ${2:IO}Inputs inputs = new ${2:IO}Inputs();",
+      "",
+      "  public ${1:SubsystemName}(${2:IO} io) {",
+      "    this.io = io;",
+      "  }",
+      "",
+      "  @Override",
+      "  public void periodic() {",
+      "    io.updateInputs(inputs);",
+      "    Logger.processInputs(\"${1:SubsystemName}\", inputs);",
+      "    ${3:// Log outputs}",
+      "  }",
+      "}"
+    ],
+    "description": "Create a new FRC Subsystem with AdvantageKit logging"
+  },
+  "AdvantageKit IO Interface": {
+    "prefix": "frc-io",
+    "body": [
+      "package frc.robot.subsystems.${1:subsystemname};",
+      "",
+      "import org.littletonrobotics.junction.AutoLog;",
+      "",
+      "public interface ${2:IO} {",
+      "  @AutoLog",
+      "  public static class ${2:IO}Inputs {",
+      "    public double ${3:position} = 0.0;",
+      "    public double ${4:velocity} = 0.0;",
+      "    public double ${5:appliedVolts} = 0.0;",
+      "    public double ${6:currentAmps} = 0.0;",
+      "  }",
+      "",
+      "  public default void updateInputs(${2:IO}Inputs inputs) {}",
+      "",
+      "  public default void ${7:setVoltage}(double volts) {}",
+      "}"
+    ],
+    "description": "Create an AdvantageKit IO interface"
+  },
+  "PID Controller Setup": {
+    "prefix": "frc-pid",
+    "body": [
+      "private final PIDController ${1:pid} = new PIDController(",
+      "  ${2:kP}, // P",
+      "  ${3:kI}, // I",
+      "  ${4:kD}  // D",
+      ");",
+      "",
+      "// In periodic or execute:",
+      "double output = ${1:pid}.calculate(${5:measurement}, ${6:setpoint});"
+    ],
+    "description": "Create a PID controller"
+  },
+  "Logger Output": {
+    "prefix": "log",
+    "body": [
+      "Logger.recordOutput(\"${1:key}\", ${2:value});"
+    ],
+    "description": "Log a value with AdvantageKit"
+  },
+  "Trigger Setup": {
+    "prefix": "frc-trigger",
+    "body": [
+      "${1:controller}.${2:button}()",
+      "  .onTrue(${3:command})",
+      "  .onFalse(${4:command});"
+    ],
+    "description": "Create a button trigger binding"
+  },
+  "Auto Command": {
+    "prefix": "frc-auto",
+    "body": [
+      "public Command ${1:autoCommandName}() {",
+      "  return Commands.sequence(",
+      "    ${2:// Add commands here}",
+      "  );",
+      "}"
+    ],
+    "description": "Create an autonomous command"
+  },
+  "PathPlanner Path": {
+    "prefix": "frc-path",
+    "body": [
+      "PathPlannerPath path = PathPlannerPath.fromPathFile(\"${1:pathName}\");",
+      "return AutoBuilder.followPath(path);"
+    ],
+    "description": "Load and follow a PathPlanner path"
+  }
+}

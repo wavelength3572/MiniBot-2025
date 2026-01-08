@@ -1,0 +1,104 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build Robot Code",
+      "type": "shell",
+      "command": "./gradlew build",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$gradle"],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Deploy to Robot",
+      "type": "shell",
+      "command": "./gradlew deploy",
+      "group": "build",
+      "problemMatcher": ["$gradle"],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Simulate Robot",
+      "type": "shell",
+      "command": "./gradlew simulateJava",
+      "group": "test",
+      "isBackground": true,
+      "problemMatcher": ["$gradle"],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Format Code (Spotless)",
+      "type": "shell",
+      "command": "./gradlew spotlessApply",
+      "group": "none",
+      "problemMatcher": ["$gradle"],
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Check Code Format",
+      "type": "shell",
+      "command": "./gradlew spotlessCheck",
+      "group": "test",
+      "problemMatcher": ["$gradle"],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Clean Build",
+      "type": "shell",
+      "command": "./gradlew clean",
+      "group": "build",
+      "problemMatcher": ["$gradle"]
+    },
+    {
+      "label": "Run Unit Tests",
+      "type": "shell",
+      "command": "./gradlew test",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": ["$gradle"],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Update WPILib",
+      "type": "shell",
+      "command": "./gradlew wpilib",
+      "group": "none",
+      "problemMatcher": []
+    }
+  ]
+}

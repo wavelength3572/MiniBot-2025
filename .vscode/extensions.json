@@ -1,5 +1,32 @@
 {
   "recommendations": [
-    "richardwillis.vscode-spotless-gradle"
+    // Code formatting and quality
+    "richardwillis.vscode-spotless-gradle",
+    "vscjava.vscode-java-pack",
+    "vscjava.vscode-gradle",
+
+    // WPILib essentials
+    "wpilibsuite.vscode-wpilib",
+
+    // Git and collaboration
+    "eamodio.gitlens",
+    "GitHub.copilot",
+    "GitHub.copilot-chat",
+
+    // Live collaboration for pairing with students
+    "ms-vsliveshare.vsliveshare",
+
+    // Documentation and comments
+    "shd101wyy.markdown-preview-enhanced",
+    "yzhang.markdown-all-in-one",
+
+    // Productivity
+    "usernamehw.errorlens",
+    "streetsidesoftware.code-spell-checker",
+    "oderwat.indent-rainbow",
+    "CoenraadS.bracket-pair-colorizer-2",
+
+    // JSON for PathPlanner and config files
+    "ZainChen.json"
   ]
 }
