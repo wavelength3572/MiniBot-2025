@@ -16,12 +16,13 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
-import frc.robot.operator_interface.OISelector;
-import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -41,7 +42,7 @@ public class RobotContainer {
   private final Drive drive;
 
   // Controller
-  private OperatorInterface oi = new OperatorInterface() {};
+  private final CommandXboxController controller = new CommandXboxController(0);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -102,45 +103,41 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-    // Configure the operator interface and button bindings
-    updateOI();
+    // Configure the button bindings
     configureButtonBindings();
   }
 
   /**
-   * This method scans for any changes to the connected joystick. If anything changed, it creates
-   * new OI objects.
-   */
-  public void updateOI() {
-    if (!OISelector.didJoysticksChange()) {
-      return;
-    }
-    oi = OISelector.findOperatorInterface();
-  }
-
-  /**
-   * Use this method to define your button->command mappings.
+   * Use this method to define your button->command mappings. Buttons can be created by
+   * instantiating a {@link GenericHID} or one of its subclasses ({@link
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
-            drive, oi::getTranslateY, oi::getTranslateX, oi::getRotate));
+            drive,
+            () -> -controller.getLeftY(),
+            () -> -controller.getLeftX(),
+            () -> -controller.getRightX()));
 
-    // Lock to 0° when lock to zero button is held
-    // On Interlink DX: Button 1 (Button A/V - near upper left top side)
-    oi.getLockToZeroButton()
+    // Lock to 0° when A button is held
+    controller
+        .a()
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
-                drive, oi::getTranslateY, oi::getTranslateX, () -> new Rotation2d()));
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> new Rotation2d()));
 
-    // Switch to X pattern when lock wheels button is pressed
-    // On Interlink DX: Button 12 (Button H - bottom right of top face)
-    oi.getLockWheelsButton().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    // Switch to X pattern when X button is pressed
+    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-    // Reset gyro to 0° when reset gyro button is pressed
-    // On Interlink DX: Button 14 (RESET button on back of controller)
-    oi.getResetGyroButton()
+    // Reset gyro to 0° when B button is pressed
+    controller
+        .b()
         .onTrue(
             Commands.runOnce(
                     () ->
@@ -148,12 +145,6 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
-
-    // Calibrate swerve modules when calibrate button is pressed
-    // IMPORTANT: Manually align all wheels to point forward BEFORE pressing this button!
-    // On Interlink DX: Button 15 (second RESET/CANCEL button on back of controller)
-    oi.getCalibrateWheelsButton()
-        .onTrue(Commands.runOnce(drive::calibrateModules, drive).ignoringDisable(true));
   }
 
   /**

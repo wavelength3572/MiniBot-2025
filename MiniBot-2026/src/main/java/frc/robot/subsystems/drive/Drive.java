@@ -58,10 +58,6 @@ public class Drive extends SubsystemBase {
   private final SysIdRoutine sysId;
   private final Alert gyroDisconnectedAlert =
       new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
-  private final Alert modulesNotCalibratedAlert =
-      new Alert(
-          "Swerve modules not calibrated! Align wheels forward and press Y button.",
-          AlertType.kWarning);
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
   private Rotation2d rawGyroRotation = new Rotation2d();
@@ -184,16 +180,6 @@ public class Drive extends SubsystemBase {
 
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
-
-    // Update calibration alert
-    modulesNotCalibratedAlert.set(
-        !areAllModulesCalibrated() && Constants.currentMode != Mode.SIM);
-
-    // Log calibration status for each module
-    for (int i = 0; i < 4; i++) {
-      Logger.recordOutput("Drive/Module" + i + "/Calibrated", modules[i].isCalibrated());
-      Logger.recordOutput("Drive/Module" + i + "/RawPosition", modules[i].getRawPosition());
-    }
   }
 
   /**
@@ -243,27 +229,6 @@ public class Drive extends SubsystemBase {
     }
     kinematics.resetHeadings(headings);
     stop();
-  }
-
-  /**
-   * Calibrates all swerve modules to their current positions as zero (wheels pointing forward).
-   * Call this after manually aligning all wheels to point straight forward.
-   */
-  public void calibrateModules() {
-    for (var module : modules) {
-      module.calibrateZeroPosition();
-    }
-  }
-
-  /** Returns true if all modules have been calibrated. */
-  @AutoLogOutput(key = "Drive/AllModulesCalibrated")
-  public boolean areAllModulesCalibrated() {
-    for (var module : modules) {
-      if (!module.isCalibrated()) {
-        return false;
-      }
-    }
-    return true;
   }
 
   /** Returns a command to run a quasistatic test in the specified direction. */

@@ -31,10 +31,6 @@ public class Module {
   private final Alert turnDisconnectedAlert;
   private SwerveModulePosition[] odometryPositions = new SwerveModulePosition[] {};
 
-  // Calibration for relative encoders
-  private Rotation2d zeroOffset = new Rotation2d(); // Offset to subtract from encoder reading
-  private boolean isCalibrated = false;
-
   public Module(ModuleIO io, int index) {
     this.io = io;
     this.index = index;
@@ -56,8 +52,7 @@ public class Module {
     odometryPositions = new SwerveModulePosition[sampleCount];
     for (int i = 0; i < sampleCount; i++) {
       double positionMeters = inputs.odometryDrivePositionsRad[i] * wheelRadiusMeters;
-      // Apply zero offset to odometry angle readings
-      Rotation2d angle = inputs.odometryTurnPositions[i].minus(zeroOffset);
+      Rotation2d angle = inputs.odometryTurnPositions[i];
       odometryPositions[i] = new SwerveModulePosition(positionMeters, angle);
     }
 
@@ -91,8 +86,7 @@ public class Module {
 
   /** Returns the current turn angle of the module. */
   public Rotation2d getAngle() {
-    // Subtract the zero offset to get the actual angle relative to forward
-    return inputs.turnPosition.minus(zeroOffset);
+    return inputs.turnPosition;
   }
 
   /** Returns the current drive position of the module in meters. */
@@ -133,21 +127,5 @@ public class Module {
   /** Returns the module velocity in rad/sec. */
   public double getFFCharacterizationVelocity() {
     return inputs.driveVelocityRadPerSec;
-  }
-
-  /** Calibrates the module zero position to the current encoder position. */
-  public void calibrateZeroPosition() {
-    zeroOffset = inputs.turnPosition;
-    isCalibrated = true;
-  }
-
-  /** Returns whether this module has been calibrated. */
-  public boolean isCalibrated() {
-    return isCalibrated;
-  }
-
-  /** Returns the raw encoder position without offset subtraction. */
-  public Rotation2d getRawPosition() {
-    return inputs.turnPosition;
   }
 }

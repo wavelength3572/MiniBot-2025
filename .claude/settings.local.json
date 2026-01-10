@@ -1,9 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(./gradlew build:*)",
-      "Bash(.gradlew.bat build)",
-      "Bash(cmd /c gradlew.bat build)"
+      "WebSearch",
+      "mcp__ide__getDiagnostics"
     ]
   }
 }
